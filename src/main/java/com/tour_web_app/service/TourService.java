@@ -35,10 +35,6 @@ public class TourService {
         return dbTour;
     }
 
-    public Tour findTourById(Long id) {
-        return tourRepository.findById(id).orElseThrow(() -> new ValidationException("Tour not found"));
-    }
-
     public Tour create(Tour tour) {
         Optional<Tour> existingTour = tourRepository.findByCheckInDateAndCheckOutDateAndCountry(tour.getCheckInDate(), tour.getCheckOutDate(), tour.getCountry());
 

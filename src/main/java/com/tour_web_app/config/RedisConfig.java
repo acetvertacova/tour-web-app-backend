@@ -20,7 +20,7 @@ import java.time.Duration;
 @ConfigurationProperties(prefix = "spring.cache.redis")
 public class RedisConfig {
 
-    private Duration timeToLive = Duration.ofSeconds(10);
+    private Duration timeToLive = Duration.ofMinutes(15);
 
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
