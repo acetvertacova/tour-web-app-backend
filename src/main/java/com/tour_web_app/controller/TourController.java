@@ -29,11 +29,6 @@ public class TourController {
         return tourService.getTourById(id);
     }
 
-    @GetMapping("tours/{id}/nocache")
-    public Tour getTourWithoutCache(@PathVariable("id") Long id) {
-        return tourService.findTourById(id);
-    }
-
     @PostMapping("/tours")
     public Tour create(@RequestBody Tour tour) {
         return tourService.create(tour);
