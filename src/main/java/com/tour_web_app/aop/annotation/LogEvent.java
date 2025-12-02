@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface LogEvent {
-    EventType eventType() default EventType.LOGIN;
+    EventType eventType();
     String description() default "";
 }
