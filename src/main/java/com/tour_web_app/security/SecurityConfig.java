@@ -1,6 +1,8 @@
 package com.tour_web_app.security;
 
+import com.tour_web_app.aop.JwtAuthenticationEntryPoint;
 import lombok.AllArgsConstructor;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,13 +31,14 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @AllArgsConstructor
 public class SecurityConfig {
     private final JwtDecoder jwtDecoder;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         return http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Включаем CORS
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tours/**").permitAll()
@@ -45,7 +48,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/bookings/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/comments/**").permitAll()
                         .anyRequest().authenticated())
-                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(STATELESS))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .oauth2ResourceServer(server -> server
                         .jwt(Customizer.withDefaults())
                         .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
@@ -62,10 +68,10 @@ public class SecurityConfig {
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173")); // адрес фронтенда
+        config.setAllowedOrigins(List.of("http://localhost:5173"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);      // to pass cookies and headers
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

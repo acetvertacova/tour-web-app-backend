@@ -24,7 +24,7 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonIgnore
-    private UserEntity user;
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "tour_id")
