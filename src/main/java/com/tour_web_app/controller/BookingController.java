@@ -1,5 +1,7 @@
 package com.tour_web_app.controller;
 
+import com.tour_web_app.aop.annotation.LogEvent;
+import com.tour_web_app.aop.enums.EventType;
 import com.tour_web_app.dto.request.BookingRequest;
 import com.tour_web_app.dto.response.BookingResponse;
 import com.tour_web_app.service.BookingService;
@@ -25,6 +27,7 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping()
+    @LogEvent(eventType = EventType.BOOKING_CREATE)
     public ResponseEntity<BookingResponse> book(@RequestBody BookingRequest request, Authentication authentication) {
         String username = authentication.getName();
         BookingResponse bookingResponse = bookingService.booking(request, username);
@@ -41,6 +44,7 @@ public class BookingController {
     }
 
     @DeleteMapping("/{id}")
+    @LogEvent(eventType = EventType.BOOKING_CANCEL)
     public ResponseEntity<BookingResponse> cancel(@PathVariable("id") Long BookingId, Authentication authentication) {
         String username = authentication.getName();
         BookingResponse canceled = bookingService.cancel(BookingId, username);

@@ -1,5 +1,7 @@
 package com.tour_web_app.controller;
 
+import com.tour_web_app.aop.annotation.LogEvent;
+import com.tour_web_app.aop.enums.EventType;
 import com.tour_web_app.dto.CommentDto;
 import com.tour_web_app.service.CommentService;
 import lombok.AllArgsConstructor;
@@ -32,6 +34,7 @@ public class CommentController {
     }
 
     @PostMapping()
+    @LogEvent(eventType = EventType.COMMENT_CREATE)
     public ResponseEntity<CommentDto> create(@RequestBody CommentDto commentDto) {
         CommentDto createdComment = commentService.create(commentDto);
 
@@ -39,6 +42,7 @@ public class CommentController {
     }
 
     @PutMapping("/{id}")
+    @LogEvent(eventType = EventType.COMMENT_UPDATE)
     @PreAuthorize("@commentSecurity.isCommentOwner(#id, authentication.name)")
     public ResponseEntity<CommentDto> update(@RequestBody CommentDto commentDto, @PathVariable long id) {
         CommentDto updatedComment = commentService.update(commentDto, id);
@@ -48,6 +52,7 @@ public class CommentController {
 
     @PreAuthorize("@commentSecurity.isCommentOwner(#id, authentication.name)")
     @DeleteMapping("/{id}")
+    @LogEvent(eventType = EventType.COMMENT_DELETE)
     public ResponseEntity<Void> deleteById(@PathVariable long id){
         commentService.deleteById(id);
 
