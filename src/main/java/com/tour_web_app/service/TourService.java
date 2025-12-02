@@ -1,15 +1,18 @@
 package com.tour_web_app.service;
 
+import com.tour_web_app.dto.SearchResult;
 import com.tour_web_app.entity.Tour;
+import com.tour_web_app.exception.CreateFailedException;
+import com.tour_web_app.exception.NotFoundException;
 import com.tour_web_app.repository.TourCacheRepository;
 import com.tour_web_app.repository.TourRepository;
-import jakarta.validation.ValidationException;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 @AllArgsConstructor
 @Service
@@ -17,12 +20,9 @@ public class TourService {
     private final TourRepository tourRepository;
     private final TourCacheRepository tourCacheRepository;
 
-    public List<Tour> getAll() {
-        List<Tour> tours = StreamSupport.stream(tourRepository
-                        .findAll()
-                        .spliterator(), false)
-                .toList();
-        return tours;
+    public SearchResult<Tour> getAll(Specification<Tour> spec, Pageable pageable) {
+        Page<Tour> page = tourRepository.findAll(spec, pageable);
+        return new SearchResult<>(page);
     }
 
     public Tour getTourById(Long id) {
@@ -30,7 +30,7 @@ public class TourService {
         if (cachedTour != null) {
             return cachedTour;
         }
-        Tour dbTour = tourRepository.findById(id).orElseThrow(() -> new ValidationException("Tour not found"));
+        Tour dbTour = tourRepository.findById(id).orElseThrow(() -> new NotFoundException("Tour not found"));
         tourCacheRepository.save(dbTour);
         return dbTour;
     }
@@ -39,11 +39,7 @@ public class TourService {
         Optional<Tour> existingTour = tourRepository.findByCheckInDateAndCheckOutDateAndCountry(tour.getCheckInDate(), tour.getCheckOutDate(), tour.getCountry());
 
         if (existingTour.isPresent()) {
-            throw new ValidationException("Tour with the same date and destination has been already created!");
-        }
-
-        if (tour.getMaxCapacity() < tour.getAvailableSpots()) {
-            throw new ValidationException("Max capacity cannot be less than available spots.");
+            throw new CreateFailedException("Tour with the same date and destination has been already created!");
         }
 
         Tour dbTour = tourRepository.save(tour);
@@ -52,9 +48,9 @@ public class TourService {
     }
 
     public Tour update(Tour tour, long id) {
-        Tour tourToUpdate = tourRepository.findById(id).orElseThrow(() -> new ValidationException("Tour not found"));
+        Tour tourToUpdate = tourRepository.findById(id).orElseThrow(() -> new NotFoundException("Tour not found"));
 
-        Tour updatedTour = tour.builder()
+        Tour updatedTour = Tour.builder()
                 .id(tourToUpdate.getId())
                 .name(tour.getName())
                 .country(tour.getCountry())

@@ -19,13 +19,13 @@ public class JwtService {
     private final JwtEncoder jwtEncoder;
     private final JwtDecoder jwtDecoder;
 
-    public String generateToken(Authentication userAuthentitication) {
-        List<String> roles = userAuthentitication.getAuthorities().stream()
+    public String generateToken(Authentication userAuthentication) {
+        List<String> roles = userAuthentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
         final var claimsSet = JwtClaimsSet.builder()
-                .subject(userAuthentitication.getName())
+                .subject(userAuthentication.getName())
                 .claim("scope", String.join(" ", roles))
                 .issuer(issuer)
                 .expiresAt(Instant.now().plus(ttl))

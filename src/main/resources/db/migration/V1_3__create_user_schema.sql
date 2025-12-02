@@ -7,5 +7,4 @@ CREATE TABLE IF NOT EXISTS Users (
 );
 
 INSERT INTO Users (username, email, password)
-VALUES ('anastasia', 'anastasia@example.com', '$2a$10$e0NRpoePXW5ZHZzNN9V8wOHpb86QxQ1p1XjRJeUm09gZzDc7t3VBe');
-
+VALUES ('anastasia', 'anastasia@example.com', '$2a$10$7H9EvnsnCRKdLfXPkgpfH.isaSYARz7OdFzhX/8gP7LR1Nyi1gCI.'); -- password: admin1

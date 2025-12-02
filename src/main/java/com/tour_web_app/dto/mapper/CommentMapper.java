@@ -1,5 +1,6 @@
-package com.tour_web_app.dto;
+package com.tour_web_app.dto.mapper;
 
+import com.tour_web_app.dto.CommentDto;
 import com.tour_web_app.entity.Comment;
 
 public class CommentMapper {

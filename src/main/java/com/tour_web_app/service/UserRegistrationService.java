@@ -1,7 +1,8 @@
 package com.tour_web_app.service;
 
 import com.tour_web_app.entity.Role;
-import com.tour_web_app.entity.UserEntity;
+import com.tour_web_app.entity.User;
+import com.tour_web_app.exception.CreateFailedException;
 import com.tour_web_app.repository.RoleRepository;
 import com.tour_web_app.repository.UserRepository;
 import jakarta.validation.ValidationException;
@@ -20,17 +21,17 @@ public class UserRegistrationService {
     private final RoleRepository roleRepository;
 
     @Transactional
-    public UserEntity registerUser(UserEntity newUser) {
+    public User registerUser(User newUser) {
         if (userRepository.existsByUsername(newUser.getUsername()) || userRepository.existsByEmail(newUser.getEmail())) {
-            throw new ValidationException("Username or Email already exists");
+            throw new CreateFailedException("Username or Email already exists");
         }
 
-        UserEntity user = UserEntity.builder()
+        User user = User.builder()
                 .username(newUser.getUsername())
                 .email(newUser.getEmail())
                 .password(passwordEncoder.encode(newUser.getPassword())).build();
 
-        Role roles = roleRepository.findByName("USER").get();
+        Role roles = roleRepository.findByName("USER").isPresent() ? roleRepository.findByName("USER").get() : null;
         user.setRoles(Collections.singletonList(roles));
 
         return userRepository.save(user);
